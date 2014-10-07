@@ -1,0 +1,15 @@
+<ion-view>
+	<ion-content>
+		<form name="myForm" ng-submit="doLogin()">
+			<div class="list">
+				<label class="item item-input">
+					<span class="input-label">Account id</span>
+					<input type="text" ng-model="loginData.account_id" required>
+				</label>
+				<label class="item">
+					<button class="button button-block button-positive" type="submit"  ng-disabled="myForm.$invalid">Log in</button>
+				</label>
+			</div>
+		</form>
+	</ion-content>
+</ion-view>
