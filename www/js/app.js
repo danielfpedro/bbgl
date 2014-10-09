@@ -48,6 +48,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.utils'])
 				}
 			}
 		})
+		.state('app.chat', {
+			url: "/chat",
+			views: {
+				'menuContent' :{
+					templateUrl: "templates/chat.html",
+					controller: 'ChatController'
+				}
+			}
+		})
 		.state('app.login', {
 			url: "/login",
 			views: {

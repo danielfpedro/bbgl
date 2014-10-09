@@ -16,7 +16,6 @@ angular.module('starter.controllers', [])
 })
 
 .controller('PlaygroundController', function($scope, $stateParams, $http, $localstorage) {
-
 	$scope.profile = $localstorage.getObject('profile');
 
 	var profiles = [];
@@ -26,8 +25,8 @@ angular.module('starter.controllers', [])
 
 	function start() {
 		profiles = $localstorage.getArray('profiles');
-		getCurrentProfile();
 		console.log(profiles);
+		getCurrentProfile();
 	}
 	function getCurrentProfile(){
 		$scope.total_profiles = profiles.length;
@@ -73,7 +72,7 @@ angular.module('starter.controllers', [])
 		$http(
 			{
 				method: 'GET',
-				url: 'http://localhost/xuxuzinho/profiles/probablyMatches/' + $scope.profile.account_id
+				url: 'http://localhost/xuxuzinho/profiles/probablyMatches/' + $scope.profile.account_id + '/' + $scope.profile.lat + '/' + $scope.profile.lng
 			}
 		)
 			.success(function(data, status, headers, config){
@@ -88,6 +87,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('LoginController', function($scope, $http, $localstorage, $stateParams, $location) {
+	window.localStorage.clear();
 	$scope.loginData = {};
 	$scope.doLogin = function(){
 		$http(
@@ -97,6 +97,7 @@ angular.module('starter.controllers', [])
 			}
 		)
 		.success(function(data, status, headers, config){
+			console.log(data);
 			$localstorage.setObject('profile', data);
 
 			$location.path('app/playground', true);
@@ -107,6 +108,23 @@ angular.module('starter.controllers', [])
 		});
 	}
 })
+.controller('ChatController', function($scope, $stateParams, $localstorage, $http) {
+	$scope.profile = $localstorage.getObject('profile');
 
+	$scope.profiles = [];
+	$http(
+		{
+			method: 'GET',
+			url: 'http://localhost/xuxuzinho/relationships/getMatches/' + $scope.profile.account_id,
+		}
+	)
+	.success(function(data, status, headers, config){
+		$scope.profiles = data;
+	})
+	.error(function(data, status, headers, config){
+		alert('Ocorreu um erro')
+	});
+
+})
 .controller('PlaylistCtrl', function($scope, $stateParams) {
 });
