@@ -1,129 +1,118 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
-	$scope.profile = {};
+.controller('AppCtrl', function($scope, $ionicModal, $localstorage, Me) {
+
 })
 
-.controller('PlaylistsCtrl', function($scope) {
-	$scope.playlists = [
-		{ title: 'Reggae', id: 1 },
-		{ title: 'Chill', id: 2 },
-		{ title: 'Dubstep', id: 3 },
-		{ title: 'Indie', id: 4 },
-		{ title: 'Rap', id: 5 },
-		{ title: 'Cowbell', id: 6 }
-	];
-})
+.controller('PlaygroundController', function($scope, $stateParams, $http, $localstorage, Me, Matches) {
+	$scope.Me = Me.data;
+	$scope.probablyMatches = Matches.probablyMatches;
+	console.log(Matches.probablyMatches);
 
-.controller('PlaygroundController', function($scope, $stateParams, $http, $localstorage) {
-	$scope.profile = $localstorage.getObject('profile');
-
-	var profiles = [];
-	$scope.current_profile = {};
-	start();
-
-
-	function start() {
-		profiles = $localstorage.getArray('profiles');
-		console.log(profiles);
-		getCurrentProfile();
-	}
-	function getCurrentProfile(){
-		$scope.total_profiles = profiles.length;
-		if ($scope.total_profiles > 0){
-			$scope.current_profile = profiles[$scope.total_profiles - 1];	
-		}
-		
-	}
-
-	$scope.setResponse = function(action, account_id){
-		$http({
-			method: 'POST',
-			url: 'http://localhost/xuxuzinho/relationships/add',
-			params: {action: action, account_id: $scope.profile.account_id, account_id2: $scope.current_profile.id}
-		})
-		.success(function(data){
-
-		})
-		.error(function(){
-			alert('erro');
-		});
-
-
-		profiles.forEach(function(value, index){
-			if (value.id == $scope.current_profile.id) {
-				profiles.splice(index, 1);
-				$localstorage.setObject('profiles', profiles);
-				start();
-			};
-		});
-		if (action == 1) { // Fornecer
-
-		} else if(action == 2){ //Gastar
-
-		} else if(action == 3){ //Não faz nada
-
-		};
-
-
-	}
-
-	$scope.getProfiles = function() {
-		$http(
-			{
-				method: 'GET',
-				url: 'http://localhost/xuxuzinho/profiles/probablyMatches/' + $scope.profile.account_id + '/' + $scope.profile.lat + '/' + $scope.profile.lng
-			}
-		)
-			.success(function(data, status, headers, config){
-				$localstorage.setObject('profiles', data);
-				start();
-			})
-			.error(function(data, status, headers, config){
-				alert('Ocorreu um erro')
+	$scope.getProbablyMatches = function(){
+		Matches.getProbablyMatches().
+			then(function(data){
+				$scope.probablyMatches = data;
 			});
 	}
 
+	$scope.setResponse = function(response){
+		Matches.setResponse(response);
+		$scope.probablyMatches = Matches.probablyMatches;
+	}
 })
 
-.controller('LoginController', function($scope, $http, $localstorage, $stateParams, $location) {
-	window.localStorage.clear();
-	$scope.loginData = {};
-	$scope.doLogin = function(){
-		$http(
-			{
-				method: 'GET',
-				url: 'http://localhost/xuxuzinho/profiles/' + $scope.loginData.account_id,
-			}
-		)
-		.success(function(data, status, headers, config){
-			console.log(data);
-			$localstorage.setObject('profile', data);
-
-			$location.path('app/playground', true);
-
-		})
-		.error(function(data, status, headers, config){
-			alert('Ocorreu um erro')
+.controller('LoginController', function($scope, $http, $localstorage, $stateParams, $location, $cacheFactory, $window, Me) {
+	$scope.doLogin = function(account_id){
+		var me = Me.get(account_id);
+		me.then(function(data){
+			$location.url('/app/playground');
 		});
 	}
 })
 .controller('ChatController', function($scope, $stateParams, $localstorage, $http) {
-	$scope.profile = $localstorage.getObject('profile');
-
-	$scope.profiles = [];
 	$http(
 		{
-			method: 'GET',
-			url: 'http://localhost/xuxuzinho/relationships/getMatches/' + $scope.profile.account_id,
+			method: 'PUT',
+			url: 'http://localhost/xuxuzinho/tey',
 		}
 	)
 	.success(function(data, status, headers, config){
-		$scope.profiles = data;
+		console.log('Resposta on success: ' + status);
 	})
 	.error(function(data, status, headers, config){
-		alert('Ocorreu um erro')
+		console.log('Resposta on error: ' + status);
 	});
+	// $scope.profile = $localstorage.getObject('profile');
+
+	// $scope.profiles = [];
+	// $http(
+	// 	{
+	// 		method: 'GET',
+	// 		url: 'http://localhost/xuxuzinho/relationships/getMatches/' + $scope.profile.account_id,
+	// 	}
+	// )
+	// .success(function(data, status, headers, config){
+	// 	$scope.profiles = data;
+	// })
+	// .error(function(data, status, headers, config){
+	// 	alert('Ocorreu um erro')
+	// });
+
+	// $http(
+	// 	{
+	// 		method: 'GET',
+	// 		url: 'http://localhost/xuxuzinho/articles',
+	// 	}
+	// )
+	// .success(function(data, status, headers, config){
+	// 	console.log('Resposta on success: ' + status);
+	// })
+	// .error(function(data, status, headers, config){
+	// 	console.log('Resposta on error: ' + status);
+	// });
+
+})
+.controller('SettingsController', function($scope, $ionicPopup, $timeout, Api, Profile, $http) {
+
+	$http({
+		url: 'http://localhost/profiles/1',
+		method:'PUT'
+	});
+
+	$scope.myProfile = Profile.get();
+	return false;
+
+	$scope.data = {};
+	$scope.data.distance = $scope.myProfile.distance;
+
+$scope.showPopupDistance = function() {
+
+  // An elaborate, custom popup
+  var myPopup = $ionicPopup.show({
+    template: '<div class="list"><div class="item range range-positive"><input ng-model="data.distance" type="range" name="volume" min="3" max="120"></div><div class="item" style="text-align: center;">{{data.distance}} KM</div></div>',
+    title: 'Distância',
+    subTitle: 'Escolha a distância do bofe',
+    scope: $scope,
+    buttons: [
+      { text: 'Cancelar' },
+      {
+        text: 'Salvar',
+        type: 'button-positive',
+        onTap: function(e) {
+        	$scope.myProfile.distance = $scope.data.distance;
+
+        	var profile = Api.Profile.get({id: $scope.myProfile.id});
+        	Api.Profile.update({id: 2}, $scope.myProfile);
+        	return true;
+        }
+      },
+    ]
+  });
+  myPopup.then(function(res) {
+    //console.log('Tapped!', res);
+  });
+ };
 
 })
 .controller('PlaylistCtrl', function($scope, $stateParams) {
