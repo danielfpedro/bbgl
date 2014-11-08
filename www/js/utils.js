@@ -1,6 +1,11 @@
-angular.module('starter.utils', [])
+angular.module('starter.utils', []).
 
-.factory('$localstorage', ['$window', function($window) {
+factory('dateUtil', [function(){
+	return {
+		dbFormat: new Date().toISOString().slice(0, 19).replace('T', ' ')
+	}
+}]).
+factory('$localstorage', ['$window', function($window) {
 	return {
 		set: function(key, value) {
 			$window.localStorage[key] = value;
