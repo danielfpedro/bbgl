@@ -1,22 +1,24 @@
 <ion-view title="Chat">
 	<ion-nav-buttons side="left">
-		<button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+		<button menu-toggle="left"class="button button-icon icon ion-navicon"></button>
 	</ion-nav-buttons>
-	<ion-content class="has-header">
+	<ion-content class="has-header has-footer">
 		<ion-refresher
 			pulling-text="Puxe para atualizar..."
 			on-refresh="doRefresh()">
 		</ion-refresher>
-		<ion-list>
-			<ion-item ng-repeat="profile in profiles" href="#/app/tey">
-				{{ profile.name }}
-				<span class="badge badge-positive" ng-show="profile.response == 2">
-					Passivo
-				</span>
-				<span class="badge badge-royal" ng-show="profile.response == 1">
-					Ativo
-				</span>
-			</ion-item>
-		</ion-list>
+		<div class="row" ng-repeat="message in messages">
+			<div class="col" ng-class="{'text-right col-offset-75': message.account_id != me.account_id}">
+				{{ message.message }}
+			</div>
+		</div>
 	</ion-content>
+
+	<div class="bar bar-footer item-input-inset">
+		<label class="item-input-wrapper">
+			<input type="text" placeholder="Enviar mensagem..." ng-model="messageToSend">
+		</label>
+		<button class="button button-icon icon ion-paper-airplane" ng-click="sendMessage()" ng-disabled="!messageToSend"></button>
+	</div>
+
 </ion-view>

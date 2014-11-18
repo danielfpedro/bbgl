@@ -1,9 +1,13 @@
-angular.module('starter.models', [])
-
-.factory('Me', ['$q', '$http', '$localstorage', function($q, $http, $localstorage) {
+angular.module('starter.models', []).
+factory('Model', [function() {
+	return {
+		baseUrl: 'http://192.168.0.100:80/bbgl'
+	}
+}]).
+factory('Me', ['$q', '$http', '$localstorage', 'Model', function($q, $http, $localstorage, Model) {
 	return {
 		model: 'Me',
-		url: 'http://192.168.0.104:80/bbgl/profiles',
+		url: Model.baseUrl + '/profiles',
 		data: $localstorage.getObject('Me'),
 		get: function(id){
 			var _this = this;
@@ -37,9 +41,41 @@ angular.module('starter.models', [])
 		}
 	};
 }]).
-factory('Matches', ['Me', '$http', '$q', '$localstorage', 'dateUtil', function(Me, $http, $q, $localstorage, dateUtil){
+factory('Message', ['$q', '$http', '$localstorage', 'Model', function($q, $http, $localstorage, Model) {
 	return {
-		url: 'http://192.168.0.104:80/bbgl/matches',
+		url: Model.baseUrl + '/messages',
+		lastRefresh: $localstorage.get('lastRefresh', null),
+		get: function(id){
+			var _this = this;
+			var messages = $q.defer();
+			$http.get(this.url).
+				success(function(data){
+					// _this.data = data;
+					// $localstorage.setObject(_this.model, data);
+					messages.resolve(data);
+				}).
+				error(function(){
+					messages.reject('Erro ao pegar o perfil na nuvem');
+				});
+			return messages.promise;
+		},
+		send: function(params){
+			var _this = this;
+			var message = $q.defer();
+			$http.post(this.url, params).
+				success(function(data){
+					message.resolve(data);
+				}).
+				error(function(){
+					messages.reject('Erro ao enviar mensagem');
+				});
+			return message.promise;
+		}
+	};
+}]).
+factory('Matches', ['Me', '$http', '$q', '$localstorage', 'dateUtil', 'Model', function(Me, $http, $q, $localstorage, dateUtil, Model){
+	return {
+		url: Model.baseUrl + '/matches',
 		probablyMatches: $localstorage.getArray('ProbablyMatches'),
 		matched: $localstorage.getArray('matched'),
 		dateMatchedLastSearch: $localstorage.get('dateMatchedLastSearch', null),

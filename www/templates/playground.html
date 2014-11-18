@@ -5,7 +5,9 @@
 	<ion-content class="has-header">
 		<h2>{{Me.name}}</h2>
 		<div ng-hide="probablyMatches.length === 0">
-			<h1>{{ probablyMatches[0].name }}</h1>
+			<h1>
+				<a href="#/app/profile/{{probablyMatches[0].account_id}}">{{ probablyMatches[0].name }}</a>
+			</h1>
 			<button class="button button-full button-royal" ng-click="setResponse(1)">Um</button>
 			<button class="button button-full button-royal" ng-click="setResponse(2)">Dois</button>
 			<button class="button button-full button-royal" ng-click="setResponse(3)">Nada</button>

@@ -9,7 +9,8 @@ angular.module('starter', [
 	'starter.controllers',
 	'starter.utils',
 	'starter.models',
-	'ngResource'])
+	'ngResource',
+	'ngCordova'])
 .run(function($ionicPlatform) {
 	$ionicPlatform.ready(function() {
 		// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -53,8 +54,17 @@ angular.module('starter', [
 				}
 			}
 		})
+		.state('app.matches', {
+			url: "/matches",
+			views: {
+				'menuContent' :{
+					templateUrl: "templates/matches.html",
+					controller: 'MatchesController'
+				}
+			}
+		})
 		.state('app.chat', {
-			url: "/chat",
+			url: "/chat/:id",
 			views: {
 				'menuContent' :{
 					templateUrl: "templates/chat.html",
@@ -68,6 +78,24 @@ angular.module('starter', [
 				'menuContent' :{
 					templateUrl: "templates/settings.html",
 					controller: 'SettingsController'
+				}
+			}
+		})
+		.state('app.profile', {
+			url: "/profile/:id",
+			views: {
+				'menuContent' :{
+					templateUrl: "templates/profile.html",
+					controller: 'ProfileController'
+				}
+			}
+		}).
+		state('app.facebook-login', {
+			url: "/facebook-login",
+			views: {
+				'menuContent' :{
+					templateUrl: "templates/facebook_login.html",
+					controller: 'FacebookLoginController'
 				}
 			}
 		})
@@ -109,6 +137,6 @@ angular.module('starter', [
 			}
 		});
 	// if none of the above states are matched, use this as the fallback
-	$urlRouterProvider.otherwise('/app/playground');
+	$urlRouterProvider.otherwise('/app/facebook-login');
 });
 

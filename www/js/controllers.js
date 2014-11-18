@@ -1,6 +1,7 @@
 angular.module('starter.controllers', [])
 
 .controller('AppCtrl', function($scope, $ionicModal, $localstorage, Me) {
+	$scope.me = Me.data;
 
 })
 
@@ -34,8 +35,61 @@ angular.module('starter.controllers', [])
 		});
 	}
 })
-.controller('ChatController', function($scope, $stateParams, $localstorage, $http, $ionicLoading, Matches) {;
+.controller('ChatController', function($scope, Message, $stateParams){
+	
+	$scope.messages = [];
 
+
+	$scope.doRefresh = function(){
+		Message.get($stateParams.id).
+			then(function(data){
+				$scope.messages = data;
+			}).
+			finally(function(){
+				$scope.$broadcast('scroll.refreshComplete');
+			});
+	}
+
+	$scope.sendMessage = function() {
+		Message.send({account_id: $scope.me.account_id, account_id2: $stateParams.id, message: $scope.messageToSend}).
+			then(function(data){
+				//$scope.messages = Message.data;
+				$scope.messageToSend = '';
+			});
+	}
+
+	$scope.doRefresh();
+
+
+}).
+controller('ProfileController', function($stateParams){
+
+}).
+
+controller('FacebookLoginController', function($scope, $stateParams, $cordovaOauth, $ionicLoading, $timeout, $http){	
+alert('dsds');
+	$scope.image = '';
+
+	$scope.facebookLogin = function (){
+		$cordovaOauth.facebook("401554549993450", ["email"]).then(function(result) {
+			$ionicLoading.show({
+				template: 'Pegando imagem'
+			});
+			$http.get('https://graph.facebook.com/me/picture?redirect=false&access_token=' + result.access_token).
+				then(function(data){
+					$ionicLoading.hide();
+					$scope.image = data.data.url;
+				}).
+				error(function(data){
+					$ionicLoading.hide();
+					alert(data);
+				});
+		}, function(error) {
+			console.log(error);
+		});
+	}
+}).
+controller('MatchesController', function($scope, $stateParams, $localstorage, $http, $ionicLoading, Matches) {;
 	$scope.profiles = [];
 
 	$scope.doRefresh = function(){
